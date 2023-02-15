@@ -3,48 +3,37 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.StringTokenizer;
-import java.util.ArrayList;
-import java.util.LinkedList;
-
 public class KillTheMonster {
+    public static boolean doesCharacterWin(double health_c, int damage_c, double health_m, int damage_m) {
+        return Math.round(Math.ceil(health_m/damage_c)) <= Math.round(Math.ceil(health_c/damage_m));
+    } 
     public static void main(String[] args) throws IOException{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        PrintWriter out =new PrintWriter(System.out);
-        StringTokenizer st = new StringTokenizer(br.readLine());
-        int n = Integer.parseInt(st.nextToken());
-        int q = Integer.parseInt(st.nextToken());
-        ArrayList<LinkedList<Integer>> unreadApps = new ArrayList<LinkedList<Integer>>(n+1);
-        while(n-- > -1) {
-            unreadApps.add(new LinkedList<Integer>());
-        }
-        int[] notif = new int[q];
-        int i = 0;
-        int sum = 0;
-        int readTill = 0;
-        while(q-- > 0) {
+        PrintWriter out = new PrintWriter(System.out);
+
+        int t = Integer.parseInt(br.readLine());
+        StringTokenizer st;
+        while(t-- > 0) {
             st = new StringTokenizer(br.readLine());
-            int type = Integer.parseInt(st.nextToken());
-            int x = Integer.parseInt(st.nextToken());
-            if(type == 1) {
-                unreadApps.get(x).add(i);
-                sum++;
-                notif[i++] = x;
-            } else if(type == 2) {
-                sum -= unreadApps.get(x).size();
-                unreadApps.set(x, new LinkedList<>());
-            } else if(type == 3) {
-                if(x > readTill) {
-                    for(int j=readTill; j<x;j++) {
-                        LinkedList<Integer> currentAppQueue = unreadApps.get(notif[j]);
-                        if(currentAppQueue.size() !=0 && currentAppQueue.peek() <= j) {
-                            currentAppQueue.remove();
-                            sum--;
-                        }
-                    }
-                    readTill = x;
+            long health_c = Long.parseLong(st.nextToken());
+            int damage_c = Integer.parseInt(st.nextToken());
+            st = new StringTokenizer(br.readLine());
+            long health_m = Long.parseLong(st.nextToken());
+            int damage_m = Integer.parseInt(st.nextToken());
+            st = new StringTokenizer(br.readLine());
+            int k = Integer.parseInt(st.nextToken());
+            int w = Integer.parseInt(st.nextToken());
+            long a = Long.parseLong(st.nextToken());
+
+            boolean wins = false; 
+            for(int i=0;i<=k;i++) {
+                if(doesCharacterWin(a*i + health_c, w*(k-i) + damage_c, health_m, damage_m)) {
+                    wins = true;
+                    break;
                 }
             }
-            out.print(sum + "\n");
+            
+            out.print((wins?"YES":"NO") + "\n");
         }
         out.flush();
     }
