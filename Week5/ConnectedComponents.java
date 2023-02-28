@@ -1,47 +1,63 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
+// import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 public class ConnectedComponents {
+    static TreeSet<Integer> unvisitedVertices = new TreeSet<>();
+    static HashMap<Integer, HashSet<Integer>> notAdjList = new HashMap<>();
+
+    public static void addEdge(int x, int y) {
+        if(notAdjList.containsKey(x)) {
+            notAdjList.get(x).add(y);
+        } else {
+            HashSet <Integer> newSet = new HashSet<>();
+            newSet.add(y);
+            notAdjList.put(x, newSet);
+        }
+    }
     public static void main(String[] args) throws IOException{
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        PrintWriter out = new PrintWriter(System.out);
+        // PrintWriter out = new PrintWriter(System.out);
         StringTokenizer st = new StringTokenizer(br.readLine());
         int n = Integer.parseInt(st.nextToken()), m = Integer.parseInt(st.nextToken());
-        int degree[] = new int[n+1];
+        for(int i=1;i<=n;i++) {
+            unvisitedVertices.add(i);
+        }
         while(m-- > 0) {
             st = new StringTokenizer(br.readLine());
             int x = Integer.parseInt(st.nextToken()), y = Integer.parseInt(st.nextToken());
-            degree[x]++;degree[y]++;
+            addEdge(x, y);
+            addEdge(y, x);
         }
-        int ones = 0, twos = 0, star = 0;
-        String s = "";
-        for(int i=1;i<=n;i++) {
-            if(degree[i] == 1) {
-                ones++;
-            } else if(degree[i] == 2) {
-                twos++;
-            } else {
-                if(star != 0) {
-                    s = "unknown";
-                    break;
-                }
-                star = degree[i]; 
+        ArrayList<Integer> sizes = new ArrayList<>();
+        int currentSize = n;
+        while(currentSize != 0) {
+            int i = unvisitedVertices.first();
+            dfs(i);
+            sizes.add(currentSize - unvisitedVertices.size());
+            currentSize = unvisitedVertices.size();
+        }
+        Collections.sort(sizes);
+        System.out.println(sizes.size());
+        for(int i: sizes) {
+            System.out.print(i + " ");
+        }
+    }
+    public static void dfs(int i) {
+        unvisitedVertices.remove(i);
+        int k = 0;
+        Integer curr;
+        while((curr = unvisitedVertices.higher(k)) != null) {
+            if(notAdjList.get(i) == null || !notAdjList.get(i).contains(curr)) {
+                dfs(curr);
             }
+            k = curr;
         }
-        if(s == "") {
-            if(ones == 2 && twos == (n-2)) {
-                s = "bus";
-            } else if(twos == n) {
-                s = "ring";
-            } else if(ones == n-1 && star == n-1 ) {
-                s = "star";
-            } else {
-                s = "unknown";
-            }
-        }
-        out.print(s + " topology\n");
-        out.flush();
     }
 }
